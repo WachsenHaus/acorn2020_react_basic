@@ -4,7 +4,11 @@ import qs from 'query-string';
 const App10_Ajax6 = () => {
   
   
-  const [formData,setFormData] = useState({id:'', pwd:''});
+  const [formData,setFormData] = useState({
+    id:'', 
+    pwd:'',
+    loginId:null
+  });
 
   const changed = (e)=>{
     //이벤트가 일어난 input 요소의 name속성의 값 (id or pwd) 읽어오기
@@ -29,19 +33,43 @@ const App10_Ajax6 = () => {
     .then(res=>res.json())
     .then(data=>{
         console.log(data);
+        if(data.isSuccess){
+          setFormData({
+            ...formData,
+            loginId:data.id
+          })
+        }
     })
     .catch(err=>{
         console.log(err);
     });
   };
+  const logout = () => {
+    //ajax 로 로그아웃 요청을 한다.
+    fetch("http://localhost:8888/spring05/users/ajax_logout")
+    .then(res => res.json())
+    .then(data =>{
+      if(data.isSuccess){
+        setFormData({
+          ...formData,
+          loginId:null
+        })
+        alert("로그 아웃 되었습니다.")
+      }
+    })
+  }
 
   return (
     <div>
+      {
+        formData.loginId && <p><strong>{formData.loginId}</strong>님 로그인중...</p>
+      }
       <h1>로그인 폼 입니다.</h1>
       <form onSubmit={submit}>
         <input onChange={changed} name="id" type="text" placeholder="아이디..."/>
         <input onChange={changed} name="pwd" type="password" placeholder="비밀번호..."/>
         <button type="submit">로그인</button>
+        <button onClick={logout}>로그아웃</button>
       </form>
       <p>{JSON.stringify(formData)}</p>
       <p>{qs.stringify(formData)}</p>
